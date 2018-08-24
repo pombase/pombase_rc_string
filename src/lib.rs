@@ -3,7 +3,7 @@ extern crate serde_json;
 
 use std::fmt;
 use std::str;
-use std::rc::Rc;
+use std::sync::Arc;
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, Add};
 use std::cmp::{Ord, Ordering};
@@ -15,7 +15,7 @@ use serde::{Serialize, Deserialize, Serializer, Deserializer,
 
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Hash)]
 pub struct RcString {
-    rc_string: Rc<String>
+    rc_string: Arc<String>
 }
 
 impl Ord for RcString {
@@ -27,18 +27,18 @@ impl Ord for RcString {
 impl RcString {
     pub fn new(s: &str) -> RcString {
         RcString {
-            rc_string: Rc::new(s.to_owned())
+            rc_string: Arc::new(s.to_owned())
         }
     }
 
     pub fn from(s: &str) -> RcString {
         RcString {
-            rc_string: Rc::new(s.to_owned())
+            rc_string: Arc::new(s.to_owned())
         }
     }
 
     pub fn ref_count(&self) -> usize {
-        Rc::strong_count(&self.rc_string)
+        Arc::strong_count(&self.rc_string)
     }
 
     pub fn as_str(&self) -> &str {
@@ -92,7 +92,7 @@ impl PartialEq<RcString> for String {
 
 impl<'a> From<&'a str> for RcString {
     fn from(s: &str) -> RcString {
-        RcString { rc_string: Rc::new(s.to_owned()) }
+        RcString { rc_string: Arc::new(s.to_owned()) }
     }
 }
 
