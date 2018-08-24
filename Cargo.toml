@@ -1,0 +1,10 @@
+[package]
+name = "pombase_rc_string"
+version = "0.1.0"
+authors = ["Kim Rutherford <kmr@aska.gen.nz>"]
+
+[dependencies]
+serde_derive = "1.0"
+serde_json = "1.0"
+serde = "1.0"
+
