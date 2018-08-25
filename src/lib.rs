@@ -5,21 +5,23 @@ extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 
+extern crate weak_table;
+
 use std::fmt;
 use std::str;
-use std::sync::{Arc, Mutex};
+use std::sync::{Weak, Arc, Mutex};
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, Add};
 use std::cmp::{Ord, Ordering};
 use std::borrow::Borrow;
-use std::collections::HashSet;
 
 use serde::{Serialize, Deserialize, Serializer, Deserializer,
             de::{Visitor, Unexpected, Error}};
 
+use weak_table::WeakHashSet;
 
 lazy_static! {
-    static ref cache: Mutex<HashSet<RcString>> = Mutex::new(HashSet::new());
+    static ref cache: Mutex<WeakHashSet<Weak<String>>> = Mutex::new(WeakHashSet::new());
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Hash)]
@@ -34,18 +36,22 @@ impl RcString {
 
     pub fn from(s: &str) -> RcString {
         let mut set = cache.lock().unwrap();
-        if !set.contains(s) {
-            set.insert(RcString {
-                rc_string: Arc::new(s.to_owned())
-            });
-        }
 
-        set.get(s).unwrap().clone()
+        if let Some(rc) = set.get(s) {
+            RcString {
+                rc_string: rc,
+            }
+        } else {
+            let arc_string = Arc::new(s.to_owned());
+            set.insert(arc_string.clone());
+            RcString {
+                rc_string: arc_string,
+            }
+        }
     }
 
     pub fn ref_count(&self) -> usize {
-        // substract because the string in the cache doesn't count
-        Arc::strong_count(&self.rc_string) - 1
+        Arc::strong_count(&self.rc_string)
     }
 
     pub fn as_str(&self) -> &str {
