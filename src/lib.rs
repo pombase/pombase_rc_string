@@ -1,50 +1,69 @@
-extern crate serde_derive;
+#[macro_use]
+extern crate lazy_static;
 
+extern crate serde_derive;
 extern crate serde;
 extern crate serde_json;
 
 use std::fmt;
 use std::str;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 use std::fmt::{Display, Formatter};
 use std::ops::{Deref, Add};
 use std::cmp::{Ord, Ordering};
 use std::borrow::Borrow;
+use std::collections::HashSet;
 
 use serde::{Serialize, Deserialize, Serializer, Deserializer,
             de::{Visitor, Unexpected, Error}};
 
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Hash)]
+lazy_static! {
+    static ref cache: Mutex<HashSet<RcString>> = Mutex::new(HashSet::new());
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Hash)]
 pub struct RcString {
     rc_string: Arc<String>
+}
+
+impl RcString {
+    pub fn new() -> RcString {
+        RcString::from("")
+    }
+
+    pub fn from(s: &str) -> RcString {
+        let mut set = cache.lock().unwrap();
+        if !set.contains(s) {
+            set.insert(RcString {
+                rc_string: Arc::new(s.to_owned())
+            });
+        }
+
+        set.get(s).unwrap().clone()
+    }
+
+    pub fn ref_count(&self) -> usize {
+        // substract because the string in the cache doesn't count
+        Arc::strong_count(&self.rc_string) - 1
+    }
+
+    pub fn as_str(&self) -> &str {
+        self.rc_string.as_ref()
+    }
+}
+
+impl Clone for RcString {
+    fn clone(&self) -> RcString {
+        RcString {
+            rc_string: self.rc_string.clone(),
+        }
+    }
 }
 
 impl Ord for RcString {
     fn cmp(&self, other: &RcString) -> Ordering {
         self.rc_string.as_ref().cmp(other.rc_string.as_ref())
-    }
-}
-
-impl RcString {
-    pub fn new(s: &str) -> RcString {
-        RcString {
-            rc_string: Arc::new(s.to_owned())
-        }
-    }
-
-    pub fn from(s: &str) -> RcString {
-        RcString {
-            rc_string: Arc::new(s.to_owned())
-        }
-    }
-
-    pub fn ref_count(&self) -> usize {
-        Arc::strong_count(&self.rc_string)
-    }
-
-    pub fn as_str(&self) -> &str {
-        self.rc_string.as_ref()
     }
 }
 

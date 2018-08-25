@@ -26,6 +26,9 @@ use pombase_rc_string::RcString;
 
 #[test]
 fn test() {
+    let zero_len = RcString::new();
+    assert_eq!(zero_len.to_string(), "");
+
     let s = RcString::from("test");
     assert!(s == "test");
     assert_eq!(s.ref_count(), 1);
@@ -34,12 +37,17 @@ fn test() {
     assert_eq!(s.ref_count(), 2);
     assert_eq!(s1.to_string(), "test");
 
+    let different_s = RcString::from("test");
+    assert_eq!(s.ref_count(), 3);
+    assert!(different_s == "test");
+
     {
         let s2 = s.clone();
-        assert_eq!(s2.ref_count(), 3);
+        assert_eq!(s.ref_count(), 4);
+        assert_eq!(s2.ref_count(), 4);
     }
 
-    assert_eq!(s.ref_count(), 2);
+    assert_eq!(s.ref_count(), 3);
 
     let s3: &str = &s;
     assert_eq!(s3, "test");
