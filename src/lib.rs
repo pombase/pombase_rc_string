@@ -1,3 +1,5 @@
+extern crate serde_derive;
+
 extern crate serde;
 extern crate serde_json;
 
@@ -132,21 +134,44 @@ impl<'a> Visitor<'a> for RcStringVisitor {
     type Value = RcString;
 
     fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-        formatter.write_str("a borrowed string")
+        formatter.write_str("a string")
     }
 
-    fn visit_borrowed_str<E>(self, v: &'a str) -> Result<Self::Value, E>
+    fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
     where
         E: Error,
     {
         Ok(RcString::from(v))
     }
 
-    fn visit_borrowed_bytes<E>(self, v: &'a [u8]) -> Result<Self::Value, E>
+    fn visit_string<E>(self, v: String) -> Result<Self::Value, E>
     where
         E: Error,
     {
-        str::from_utf8(v).map(RcString::from).map_err(|_| Error::invalid_value(Unexpected::Bytes(v), &self))
+        Ok(RcString::from(&v))
+    }
+
+    fn visit_bytes<E>(self, v: &[u8]) -> Result<Self::Value, E>
+    where
+        E: Error,
+    {
+        match str::from_utf8(v) {
+            Ok(s) => Ok(RcString::from(s)),
+            Err(_) => Err(Error::invalid_value(Unexpected::Bytes(v), &self)),
+        }
+    }
+
+    fn visit_byte_buf<E>(self, v: Vec<u8>) -> Result<Self::Value, E>
+    where
+        E: Error,
+    {
+        match String::from_utf8(v) {
+            Ok(s) => Ok(RcString::from(&s)),
+            Err(e) => Err(Error::invalid_value(
+                Unexpected::Bytes(&e.into_bytes()),
+                &self,
+            )),
+        }
     }
 }
 
@@ -168,52 +193,6 @@ impl<'a> From<&'a RcString> for String {
 impl From<RcString> for String {
     fn from(s: RcString) -> String {
         String::from(s.as_ref())
-    }
-}
-
-
-#[cfg(test)]
-mod tests {
-    use std::collections::HashMap;
-
-    use serde_json;
-
-    use RcString;
-
-    #[test]
-    fn test() {
-        let s = RcString::from("test");
-        assert!(s == "test");
-        assert_eq!(s.ref_count(), 1);
-        assert_eq!(s.to_string(), "test");
-        let s1 = s.clone();
-        assert_eq!(s.ref_count(), 2);
-        assert_eq!(s1.to_string(), "test");
-
-        {
-            let s2 = s.clone();
-            assert_eq!(s.ref_count(), 3);
-        }
-
-        assert_eq!(s.ref_count(), 2);
-
-        let s3: &str = &s;
-        assert_eq!(s3, "test");
-
-        let mut m: HashMap<RcString, RcString> = HashMap::new();
-
-        m.insert("key".into(), "value".into());
-
-        for key in m.keys() {
-            assert_eq!(key, "key");
-        }
-        for v in m.values() {
-            assert_eq!(v, "value");
-        }
-
-        let serialized = serde_json::to_string(&m).unwrap();
-
-        assert_eq!(serialized, "{\"key\":\"value\"}");
     }
 }
 
