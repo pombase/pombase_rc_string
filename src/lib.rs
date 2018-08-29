@@ -58,12 +58,12 @@ impl RcString {
         self.rc_string.as_ref()
     }
 
-    pub fn to_lowercase(&self) -> RcString {
-        RcString::from(&self.rc_string.to_lowercase())
+    pub fn to_lowercase(&self) -> String {
+        self.rc_string.to_lowercase()
     }
 
-    pub fn to_uppercase(&self) -> RcString {
-        RcString::from(&self.rc_string.to_uppercase())
+    pub fn to_uppercase(&self) -> String {
+        self.rc_string.to_uppercase()
     }
 }
 
