@@ -41,6 +41,9 @@ fn test() {
     assert_eq!(s.ref_count(), 3);
     assert!(different_s == "test");
 
+    assert_eq!(s.to_uppercase(), "TEST");
+    assert_eq!(s.to_uppercase().to_lowercase(), "test");
+
     {
         let s2 = s.clone();
         assert_eq!(s.ref_count(), 4);

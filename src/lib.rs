@@ -57,6 +57,14 @@ impl RcString {
     pub fn as_str(&self) -> &str {
         self.rc_string.as_ref()
     }
+
+    pub fn to_lowercase(&self) -> RcString {
+        RcString::from(&self.rc_string.to_lowercase())
+    }
+
+    pub fn to_uppercase(&self) -> RcString {
+        RcString::from(&self.rc_string.to_uppercase())
+    }
 }
 
 impl Clone for RcString {
