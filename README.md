@@ -6,7 +6,7 @@ memory usage.
 Build status
 ------------
 
-[![Build Status](https://travis-ci.org/pombase/pombase-chado-json.svg?branch=master)](https://travis-ci.org/pombase/pombase-chado-json)
+[![Build Status](https://travis-ci.org/pombase/pombase_rc_string.svg?branch=master)](https://travis-ci.org/pombase/pombase_rc_string)
 
 
 Copyright 2018 Kim Rutherford and PomBase
