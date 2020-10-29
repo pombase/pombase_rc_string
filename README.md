@@ -6,7 +6,6 @@ memory usage.
 Build status
 ------------
 
-[![Build Status](https://travis-ci.org/pombase/pombase_rc_string.svg?branch=master)](https://travis-ci.org/pombase/pombase_rc_string)
-
+![Rust](https://github.com/pombase/pombase_rc_string/workflows/Rust/badge.svg)
 
 Copyright 2018 Kim Rutherford and PomBase

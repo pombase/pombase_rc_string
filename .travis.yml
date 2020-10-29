@@ -1,5 +1,0 @@
-language: rust
-rust:
-  - stable
-sudo: required
-dist: trusty
