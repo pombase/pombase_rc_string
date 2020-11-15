@@ -97,14 +97,21 @@ fn test() {
          "GO:0061630", "GO:0005737", "GO:0005794", "GO:0071944"]
         .iter().map(|s| RcString::from(s)).collect();
 
-    arr.sort_by(|s1, s2| {
-        s1.cmp(&s2)
-    });
+    arr.sort();
 
-    let expected_arr: Vec<RcString> =
+    let mut expected_arr: Vec<RcString> =
         ["GO:0005737", "GO:0005794", "GO:0006511", "GO:0061630",
          "GO:0071944", "GO:0120113", "GO:1905530", "GO:1905533"]
         .iter().map(|s| RcString::from(s)).collect();
+
+    assert_eq!(arr, expected_arr);
+
+
+    arr.sort_by(|s1, s2| {
+        s2.cmp(&s1)
+    });
+
+    expected_arr.reverse();
 
     assert_eq!(arr, expected_arr);
 }
