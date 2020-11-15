@@ -21,7 +21,7 @@ use serde::{Serialize, Deserialize, Serializer, Deserializer,
 use weak_table::WeakHashSet;
 
 lazy_static! {
-    static ref cache: Mutex<WeakHashSet<Weak<String>>> = Mutex::new(WeakHashSet::new());
+    static ref CACHE: Mutex<WeakHashSet<Weak<String>>> = Mutex::new(WeakHashSet::new());
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Hash)]
@@ -35,7 +35,7 @@ impl RcString {
     }
 
     pub fn from(s: &str) -> RcString {
-        let mut set = cache.lock().unwrap();
+        let mut set = CACHE.lock().unwrap();
 
         if let Some(rc) = set.get(s) {
             RcString {
