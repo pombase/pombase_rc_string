@@ -91,5 +91,21 @@ fn test() {
     let deserialized: SerTest = serde_json::from_str(&serialized).unwrap();
 
     assert_eq!(deserialized.field, "field_value");
+
+    let mut arr: Vec<RcString> =
+        ["GO:0006511", "GO:0120113", "GO:1905530", "GO:1905533",
+         "GO:0061630", "GO:0005737", "GO:0005794", "GO:0071944"]
+        .iter().map(|s| RcString::from(s)).collect();
+
+    arr.sort_by(|s1, s2| {
+        s1.cmp(&s2)
+    });
+
+    let expected_arr: Vec<RcString> =
+        ["GO:0005737", "GO:0005794", "GO:0006511", "GO:0061630",
+         "GO:0071944", "GO:0120113", "GO:1905530", "GO:1905533"]
+        .iter().map(|s| RcString::from(s)).collect();
+
+    assert_eq!(arr, expected_arr);
 }
 
