@@ -1,6 +1,6 @@
 [package]
 name = "pombase_rc_string"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Kim Rutherford <kmr@aska.gen.nz>"]
 edition = "2021"
 
